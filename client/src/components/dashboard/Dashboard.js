@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaShoppingCart, FaHeart, FaUser, FaCog } from 'react-icons/fa';
+import { FaShoppingCart, FaHeart, FaUser, FaCog, FaBox, FaStar, FaHistory } from 'react-icons/fa';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -27,12 +27,10 @@ const Dashboard = () => {
     }
   };
 
-
-
   if (loading) {
     return (
       <div className="dashboard-container">
-        <div className="text-center">
+        <div className="loading-spinner">
           <div className="spinner"></div>
           <p>Loading dashboard...</p>
         </div>
@@ -43,66 +41,158 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>Dashboard</h1>
-        <p>Welcome back, {user?.firstName}!</p>
-      </div>
-
-      <div className="dashboard-stats">
-        <div className="stat-card">
-          <h3>{orders.length}</h3>
-          <p>Total Orders</p>
-        </div>
-        <div className="stat-card">
-          <h3>0</h3>
-          <p>Wishlist Items</p>
-        </div>
-        <div className="stat-card">
-          <h3>0</h3>
-          <p>Reviews Given</p>
+        <div className="welcome-section">
+          <h1>Hello, {user?.firstName}!</h1>
+          <p>Welcome to your Thanka Art dashboard</p>
         </div>
       </div>
 
-      <div className="dashboard-actions">
-        <Link to="/products" className="btn btn-primary">
-          <FaShoppingCart /> Browse Products
-        </Link>
-        <Link to="/cart" className="btn btn-secondary">
-          <FaShoppingCart /> View Cart
-        </Link>
-        <Link to="/profile" className="btn btn-outline-primary">
-          <FaUser /> Edit Profile
-        </Link>
-      </div>
+      <div className="dashboard-content">
+        <div className="dashboard-stats">
+          <div className="stat-card">
+            <div className="stat-icon">
+              <FaBox />
+            </div>
+            <div className="stat-info">
+              <h3>{orders.length}</h3>
+              <p>Total Orders</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <FaHeart />
+            </div>
+            <div className="stat-info">
+              <h3>0</h3>
+              <p>Wishlist Items</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <FaStar />
+            </div>
+            <div className="stat-info">
+              <h3>0</h3>
+              <p>Reviews Given</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <FaHistory />
+            </div>
+            <div className="stat-info">
+              <h3>0</h3>
+              <p>Items Viewed</p>
+            </div>
+          </div>
+        </div>
 
-      <div className="orders-section">
-        <h2>Recent Orders</h2>
-        {orders.length === 0 ? (
-          <div className="no-orders">
-            <p>You haven't placed any orders yet.</p>
-            <Link to="/products" className="btn btn-primary">
-              <FaShoppingCart /> Start Shopping
+        <div className="dashboard-actions">
+          <h2>Quick Actions</h2>
+          <div className="action-buttons">
+            <Link to="/products" className="action-btn primary">
+              <FaShoppingCart />
+              <span>Browse Products</span>
+            </Link>
+            <Link to="/cart" className="action-btn secondary">
+              <FaShoppingCart />
+              <span>View Cart</span>
+            </Link>
+            <Link to="/profile" className="action-btn outline">
+              <FaUser />
+              <span>Edit Profile</span>
+            </Link>
+            <Link to="/wishlist" className="action-btn outline">
+              <FaHeart />
+              <span>Wishlist</span>
             </Link>
           </div>
-        ) : (
-          <div className="orders-grid">
-            {orders.map(order => (
-              <div key={order._id} className="order-card">
-                <div className="order-header">
-                  <h3>Order #{order._id}</h3>
-                  <span className={`status ${order.status}`}>
-                    {order.status}
-                  </span>
-                </div>
-                <p>Total: ${order.total}</p>
-                <div className="order-actions">
-                  <Link to={`/orders/${order._id}`} className="btn btn-sm btn-primary">
-                    View Details
-                  </Link>
-                </div>
-              </div>
-            ))}
+        </div>
+
+        <div className="orders-section">
+          <div className="section-header">
+            <h2>Recent Orders</h2>
+            <Link to="/orders" className="view-all">View all orders</Link>
           </div>
-        )}
+          
+          {orders.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">
+                <FaBox />
+              </div>
+              <h3>No orders yet</h3>
+              <p>You haven't placed any orders yet. Start shopping to see your order history here.</p>
+              <Link to="/products" className="btn-primary">
+                <FaShoppingCart />
+                Start Shopping
+              </Link>
+            </div>
+          ) : (
+            <div className="orders-grid">
+              {orders.map(order => (
+                <div key={order._id} className="order-card">
+                  <div className="order-header">
+                    <div className="order-info">
+                      <h3>Order #{order._id}</h3>
+                      <span className="order-date">{new Date(order.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <span className={`status ${order.status}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="order-details">
+                    <p className="order-total">Total: ${order.total}</p>
+                    <p className="order-items">{order.items?.length || 0} items</p>
+                  </div>
+                  <div className="order-actions">
+                    <Link to={`/orders/${order._id}`} className="btn-outline">
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="recommendations-section">
+          <div className="section-header">
+            <h2>Recommended for You</h2>
+            <Link to="/products" className="view-all">View all products</Link>
+          </div>
+          <div className="recommendations-grid">
+            <div className="recommendation-card">
+              <div className="recommendation-image">
+                <span>Buddha Thanka</span>
+              </div>
+              <div className="recommendation-info">
+                <h3>Sacred Buddha Thanka</h3>
+                <p>Traditional Tibetan Buddhist painting</p>
+                <span className="price">$299</span>
+              </div>
+            </div>
+            <div className="recommendation-card">
+              <div className="recommendation-image">
+                <span>Mandala Art</span>
+              </div>
+              <div className="recommendation-info">
+                <h3>Sacred Mandala Thanka</h3>
+                <p>Intricate geometric patterns</p>
+                <span className="price">$399</span>
+              </div>
+            </div>
+            <div className="recommendation-card">
+              <div className="recommendation-image">
+                <span>Bodhisattva</span>
+              </div>
+              <div className="recommendation-info">
+                <h3>Bodhisattva Thanka</h3>
+                <p>Compassionate being depiction</p>
+                <span className="price">$349</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
